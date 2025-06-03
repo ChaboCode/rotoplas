@@ -17,6 +17,7 @@ func DBInstance() *mongo.Client {
 	}
 
 	mongodb := os.Getenv("MONGODB_URI")
+	log.Printf("Connecting to MongoDB at %s", mongodb)
 	client, err := mongo.Connect(options.Client().ApplyURI(mongodb))
 
 	if err != nil {

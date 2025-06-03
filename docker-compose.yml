@@ -1,20 +1,26 @@
 services:
   rotoplas:
     # image: myapp:latest
-    build: 
+    restart: always
+    build:
       context: .
       network: host
     ports:
-      - "8080:80"
-    environment:
-      - MONGODB_URI=mongodb://root:example@localhost:27017/rotoplas
+      - "8080:8080"
     volumes:
       - ./files:/usr/src/app/files
+    depends_on:
+      - mongo
+
   mongo:
     image: mongo:latest
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-    ports:
-      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    # ports:
+    # - "27017:27017"
+volumes:
+  mongo-data:

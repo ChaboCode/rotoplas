@@ -72,16 +72,24 @@ type File struct {
 }
 
 func listFilesMongo() []File {
+	log.Println("Enter listing file")
 	fileCollection := database.OpenCollection(database.Client, "files")
+	log.Println("Connection made")
 
-	cursor, err := fileCollection.Find(context.TODO(), bson.D{})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	log.Println("Contex made")
+	log.Println("Starting to find files")
+
+	cursor, err := fileCollection.Find(ctx, bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer cursor.Close(context.TODO())
+	log.Println("Files found")
+	defer cursor.Close(ctx)
 
 	var files []File
-	for cursor.Next(context.TODO()) {
+	for cursor.Next(ctx) {
 		var file models.File
 		if err := cursor.Decode(&file); err != nil {
 			log.Fatal(err)
