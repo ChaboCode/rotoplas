@@ -1,0 +1,18 @@
+services:
+  app:
+    image: myapp:latest
+    build: 
+      context: .
+      network: host
+    ports:
+      - "8080:80"
+    volumes:
+      - ./files:/usr/src/app/files
+  mongo:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
