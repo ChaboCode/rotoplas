@@ -26,7 +26,11 @@ func postFile(c *gin.Context) {
 	encoded := hash(file.Filename)
 	encoded += "." + strings.Split(file.Filename, ".")[1]
 
-	c.SaveUploadedFile(file, "./files/"+encoded)
+	err := c.SaveUploadedFile(file, "./files/"+encoded)
+	if err != nil {
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "File uploaded successfully",
 		"filename": encoded,
@@ -109,6 +113,7 @@ func main() {
 	router.GET("/hash", getHash)
 	router.POST("/upload", postFile)
 	router.Static("/files", "./files")
+	router.StaticFile("favicon.ico", "./favicon.ico")
 	router.Use(middleware.Auth())
 
 	router.Run(":" + os.Getenv("PORT"))
