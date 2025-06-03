@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"hash/fnv"
 	"io/fs"
 	"log"
@@ -8,12 +10,15 @@ import (
 	"os"
 	"path"
 	"rotoplas/controllers"
-	"rotoplas/middleware"
+	"rotoplas/database"
+	"rotoplas/models"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func getAlbums(c *gin.Context) {
@@ -21,12 +26,26 @@ func getAlbums(c *gin.Context) {
 }
 
 func postFile(c *gin.Context) {
+	fileCollection := database.OpenCollection(database.Client, "files")
+
 	file, _ := c.FormFile("file")
 	log.Printf("%s", file.Filename)
 	encoded := hash(file.Filename)
-	encoded += "." + strings.Split(file.Filename, ".")[1]
+	encoded += "." + strings.Split(file.Filename, ".")[len(strings.Split(file.Filename, "."))-1]
 
-	err := c.SaveUploadedFile(file, "./files/"+encoded)
+	res, err := fileCollection.InsertOne(c, models.File{
+		Name:      encoded,
+		Size:      file.Size,
+		CreatedAt: time.Now(),
+		UploadIP:  c.ClientIP(),
+	})
+
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error saving file metadata")
+		return
+	}
+
+	err = c.SaveUploadedFile(file, "./files/"+encoded)
 	if err != nil {
 		return
 	}
@@ -34,19 +53,50 @@ func postFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "File uploaded successfully",
 		"filename": encoded,
+		"id":       res.InsertedID,
 	})
 }
 
 func homePage(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"files": listFiles("./files"),
+		"files": listFilesMongo(),
 	})
 }
 
 type File struct {
+	URL   string
 	Name  string
 	IsImg bool
 	IsVid bool
+	Size  string
+}
+
+func listFilesMongo() []File {
+	fileCollection := database.OpenCollection(database.Client, "files")
+
+	cursor, err := fileCollection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cursor.Close(context.TODO())
+
+	var files []File
+	for cursor.Next(context.TODO()) {
+		var file models.File
+		if err := cursor.Decode(&file); err != nil {
+			log.Fatal(err)
+		}
+
+		files = append(files, File{
+			Name:  file.Name,
+			URL:   "files/" + file.Name,
+			IsVid: strings.TrimPrefix(path.Ext(file.Name), ".") == "mp4" || strings.TrimPrefix(path.Ext(file.Name), ".") == "webm",
+			IsImg: strings.TrimPrefix(path.Ext(file.Name), ".") == "jpg" || strings.TrimPrefix(path.Ext(file.Name), ".") == "jpeg" || strings.TrimPrefix(path.Ext(file.Name), ".") == "png" || strings.TrimPrefix(path.Ext(file.Name), ".") == "gif" || strings.TrimPrefix(path.Ext(file.Name), ".") == "webp" || strings.TrimPrefix(path.Ext(file.Name), ".") == "avif" || strings.TrimPrefix(path.Ext(file.Name), ".") == "svg",
+			Size:  fmt.Sprintf("%.5f", float32(file.Size)/(1024*1024)),
+		})
+	}
+
+	return files
 }
 
 func listFiles(dir string) []File {
@@ -114,7 +164,7 @@ func main() {
 	router.POST("/upload", postFile)
 	router.Static("/files", "./files")
 	router.StaticFile("favicon.ico", "./favicon.ico")
-	router.Use(middleware.Auth())
+	// router.Use(middleware.Auth())
 
 	router.Run(":" + os.Getenv("PORT"))
 }
