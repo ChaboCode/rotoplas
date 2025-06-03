@@ -35,11 +35,17 @@ func postFile(c *gin.Context) {
 
 func homePage(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"imgs": listFiles("./files"),
+		"files": listFiles("./files"),
 	})
 }
 
-func listFiles(dir string) []string {
+type File struct {
+	Name  string
+	IsImg bool
+	IsVid bool
+}
+
+func listFiles(dir string) []File {
 	root := os.DirFS(dir)
 
 	mdFiles, err := fs.Glob(root, "*")
@@ -48,9 +54,13 @@ func listFiles(dir string) []string {
 		log.Fatal(err)
 	}
 
-	var files []string
+	var files []File
 	for _, v := range mdFiles {
-		files = append(files, path.Join(dir, v))
+		files = append(files, File{
+			Name:  path.Join(dir, v),
+			IsVid: strings.TrimPrefix(path.Ext(v), ".") == "mp4" || strings.TrimPrefix(path.Ext(v), ".") == "webm",
+			IsImg: strings.TrimPrefix(path.Ext(v), ".") == "jpg" || strings.TrimPrefix(path.Ext(v), ".") == "jpeg" || strings.TrimPrefix(path.Ext(v), ".") == "png" || strings.TrimPrefix(path.Ext(v), ".") == "gif" || strings.TrimPrefix(path.Ext(v), ".") == "webp" || strings.TrimPrefix(path.Ext(v), ".") == "avif" || strings.TrimPrefix(path.Ext(v), ".") == "svg",
+		})
 	}
 	return files
 }

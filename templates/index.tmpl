@@ -5,27 +5,44 @@
     <title>Rotoplas Uploader</title>
   </head>
   <body>
-    <form
-      id="uploadForm"
-      action="/upload"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      <label for="file">Select a file to upload:</label>
-      <input type="file" id="file" name="file" required />
-      <br /><br />
-      <button type="submit">Upload</button>
-    </form>
-    <p id="urls"></p>
-    {{ range.imgs }}
-    <a href="/{{.}}">
-      <img
-        src="/{{.}}"
-        alt="/{{.}}"
-        style="max-width: 200px; max-height: 200px; margin: 10px"
-      />
-    </a>
-    {{ end }}
+    <div class="container">
+      <form
+        id="uploadForm"
+        action="/upload"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <label for="file">Select a file to upload:</label>
+        <input type="file" id="file" name="file" required />
+        <br /><br />
+        <button type="submit">Upload</button>
+      </form>
+      <p id="urls"></p>
+
+      <div class="urls">
+        {{ range.files }}
+
+        <a href="/{{.Name}}">
+          {{ if .IsImg }}
+          <img
+            src="/{{.Name}}"
+            alt="/{{.Name}}"
+            style="max-width: 200px; max-height: 200px; margin: 10px"
+          />
+          {{ end }}
+
+          {{ if .IsVid }}
+          <video
+            src="/{{.Name}}"
+            controls
+            style="max-width: 300px; max-height: 200px; margin: 10px"
+          ></video>
+          {{ end }}
+          {{.Name}}
+        </a>
+        {{ end }}
+      </div>
+    </div>
   </body>
   <script>
     document.querySelector("#uploadForm").addEventListener("submit", (e) => {
@@ -47,3 +64,69 @@
     });
   </script>
 </html>
+
+<style>
+  img,
+  video,
+  a {
+    margin: none;
+  }
+
+  form {
+    border: 2px solid #c7d47d;
+    border-radius: 20px;
+    padding: 20px
+  }
+
+  .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+  }
+
+  .urls {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    /* width: 1000px; */
+    justify-items: center;
+    align-items: center;
+    /* gap: 12px; */
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    color: black;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  a:hover {
+    color: #007bff;
+    text-decoration: underline;
+  }
+
+  a:hover > * {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  }
+
+  img,
+  video {
+    /* border-radius: 10px; */
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    transition: 0.3s;
+  }
+
+  img:hover,
+  video:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+</style>
