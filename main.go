@@ -95,11 +95,11 @@ func main() {
 	router.POST("/signup", controllers.SignUp())
 	router.POST("/login", controllers.Login())
 	router.GET("/", homePage)
-	router.Use(middleware.Auth())
 
 	router.GET("/hash", getHash)
 	router.POST("/upload", postFile)
 	router.Static("/files", "./files")
+	router.Use(middleware.Auth())
 
 	router.Run(":" + os.Getenv("PORT"))
 }

@@ -1,11 +1,13 @@
 services:
-  app:
-    image: myapp:latest
+  rotoplas:
+    # image: myapp:latest
     build: 
       context: .
       network: host
     ports:
       - "8080:80"
+    environment:
+      - MONGODB_URI=mongodb://root:example@localhost:27017/rotoplas
     volumes:
       - ./files:/usr/src/app/files
   mongo:

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -24,7 +23,7 @@ func DBInstance() *mongo.Client {
 		log.Fatal("Error connecting to MongoDB:", err)
 	}
 
-	fmt.Println("Connected to MongoDB")
+	log.Println("Connected to MongoDB")
 	return client
 }
 
