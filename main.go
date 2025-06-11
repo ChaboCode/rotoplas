@@ -63,6 +63,10 @@ func homePage(c *gin.Context) {
 	})
 }
 
+func faqPage(c *gin.Context) {
+	c.HTML(http.StatusOK, "faq.html", gin.H{})
+}
+
 type File struct {
 	URL   string
 	Name  string
@@ -167,6 +171,7 @@ func main() {
 	router.POST("/signup", controllers.SignUp())
 	router.POST("/login", controllers.Login())
 	router.GET("/", homePage)
+	router.GET("/faq", faqPage)
 
 	router.GET("/hash", getHash)
 	router.POST("/upload", postFile)
