@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"hash/fnv"
 	"io/fs"
 	"log"
@@ -85,7 +86,8 @@ func listFilesMongo() []File {
 	log.Println("Contex made")
 	log.Println("Starting to find files")
 
-	cursor, err := fileCollection.Find(ctx, bson.D{})
+	opts := options.Find().SetSort(bson.D{{"created_at", -1}})
+	cursor, err := fileCollection.Find(ctx, bson.D{}, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
