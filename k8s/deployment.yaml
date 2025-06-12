@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rotoplas
+  namespace: rotoplas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rotoplas
+  template:
+    metadata:
+      labels:
+        app: rotoplas
+    spec:
+      containers:
+        - name: rotoplas
+          image: rotoplas:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+

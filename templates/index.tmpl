@@ -6,7 +6,7 @@
   </head>
   <body>
     <div class="container">
-      <img src="/favicon.ico" aria- />
+      <img src="/favicon.ico" class="icon" />
       <h1>Rotoplas Uploader</h1>
       <form
         id="uploadForm"
@@ -27,7 +27,7 @@
         <div>
           {{ if .IsImg }}
           <img
-            src="{{.URL}}"
+            src="/thumbs/{{.Name}}"
             alt="{{.Name}}"
             style="max-width: 200px; max-height: 200px; margin: 10px"
           />
@@ -35,12 +35,12 @@
 
           {{ if .IsVid }}
           <video
-            src="{{.URL}}"
+            src="/files/{{.Name}}"
             controls
             style="max-width: 300px; max-height: 200px; margin: 10px"
           ></video>
           {{ end }}
-          <a href="/{{.URL}}">
+          <a href="/files/{{.Name}}">
             {{.Name}}
           </a>
           <p class="size">Size: {{.Size}} MB</p>
@@ -78,7 +78,7 @@
     margin: none;
   }
 
-  img {
+  .icon {
     image-rendering: pixelated;
   }
 
@@ -136,8 +136,21 @@
   video {
     /* border-radius: 10px; */
     width: 120px;
-    height: 120px;
+    max-height: 120px;
     object-fit: cover;
     transition: 0.3s;
+  }
+
+  @media only screen and (max-width: 800px) {
+    .urls {
+        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    .urls {
+        grid-template-columns: repeat(2, 1fr);
+    }
   }
 </style>
