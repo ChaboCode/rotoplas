@@ -23,6 +23,7 @@
         <p id="urls"></p>
 
         <div class="file-list">
+          {{ $admin := .admin }}
           {{ range.files }}
 
           <div class="file-item">
@@ -41,12 +42,22 @@
             <a href="/files/{{.Name}}">
               {{.Name}}
             </a>
+            {{ if $admin}}
+            <a href="/delete?name={{.Name}}" style="color: red">
+              <p>Delete</p>
+            </a>
+            {{ end }}
           </div>
 
           {{ end }}
         </div>
       </div>
     </center>
+    <footer>
+      <a href="faq">
+        <p>FAQ</p>
+      </a>
+    </footer>
   </body>
   <script>
     document.querySelector("#uploadForm").addEventListener("submit", (e) => {
@@ -71,6 +82,10 @@
   <style>
     body {
       background-image: url("/bg.png");
+    }
+
+    video {
+      height: 140px;
     }
 
     p {

@@ -71,10 +71,18 @@ func AddFile(file models.File) (int64, error) {
 	return id, nil
 }
 
+func DeleteFile(name string) error {
+	_, err := db.Exec("DELETE FROM rotoplas WHERE name = ?", name)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func ListFiles(count int, page int) ([]File, error) {
 	var files []File
 
-	rows, err := db.Query("SELECT * FROM rotoplas LIMIT ? OFFSET ?", count, (page-1)*count)
+	rows, err := db.Query("SELECT * FROM rotoplas ORDER BY created_at DESC LIMIT ? OFFSET ? ", count, (page-1)*count)
 	if err != nil {
 		return nil, err
 	}

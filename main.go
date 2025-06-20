@@ -162,6 +162,7 @@ func isAudio(mime string) bool {
 }
 
 func homePage(c *gin.Context) {
+	admin := c.Query("admin")
 	files, err := database.ListFiles(10, 1)
 	if err != nil {
 		log.Printf("Error listing files: %v", err)
@@ -169,7 +170,20 @@ func homePage(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"files": files})
+		"files": files,
+		"admin": admin == "admin"})
+}
+
+func delete(c *gin.Context) {
+	name := c.Query("name")
+
+	err := database.DeleteFile(name)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error deleting file")
+		return
+	}
+
+	c.String(http.StatusOK, "File deleted successfully")
 }
 
 func main() {
@@ -209,6 +223,7 @@ func main() {
 	router.GET("/", homePage)
 	router.GET("/hash", getHash)
 	router.POST("/upload", postFile)
+	router.GET("/delete/", delete)
 	router.Static("/files", "./files")
 	router.GET("/thumbs/:filename", getThumbnail)
 	router.StaticFile("favicon.ico", "./favicon.ico")
