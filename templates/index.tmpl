@@ -35,6 +35,13 @@
             <video src="/files/{{.Name}}" controls="false"></video>
             {{ end }}
 
+            {{ if .MimeType | isAudio }}
+            <audio controls>
+              <source src="/files/{{.Name}}" type="{{.MimeType}}" />
+              Your browser does not support the audio element.
+            </audio>
+            {{ end }}
+
             <p>Size: {{.Size}}</p>
             <p>{{.CreatedAt}}</p>
             <p>{{.MimeType}}</p>
@@ -52,6 +59,16 @@
           {{ end }}
         </div>
       </div>
+      {{if .prev}}
+      <a href="/?page={{.prevPage}}"
+        ><button><em><</em> Previous</button></a
+      >
+      {{ end }}
+      {{if .next}}
+      <a href="/?page={{.nextPage}}"
+        ><button>Next <em>></em></button></a
+      >
+      {{ end }}
     </center>
     <footer>
       <a href="faq">

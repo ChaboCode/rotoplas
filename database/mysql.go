@@ -101,7 +101,15 @@ func ListFiles(count int, page int) ([]File, error) {
 	}
 
 	return files, nil
+}
 
+func Count() (int64, error) {
+	var count int64
+	err := db.QueryRow("SELECT COUNT(*) FROM rotoplas").Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 func initTable() {

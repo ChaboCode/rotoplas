@@ -163,15 +163,28 @@ func isAudio(mime string) bool {
 
 func homePage(c *gin.Context) {
 	admin := c.Query("admin")
-	files, err := database.ListFiles(10, 1)
+	pageStr := c.Query("page")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		page = 1 // Default to page 1 if parsing fails
+	}
+
+	files, err := database.ListFiles(10, page)
+	count, _ := database.Count()
+
 	if err != nil {
 		log.Printf("Error listing files: %v", err)
 		c.String(http.StatusInternalServerError, "Error retrieving files")
 		return
 	}
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"files": files,
-		"admin": admin == "admin"})
+		"files":    files,
+		"admin":    admin == "admin",
+		"next":     int(count) > page*10,
+		"prev":     page > 1,
+		"nextPage": page + 1,
+		"prevPage": page - 1})
 }
 
 func delete(c *gin.Context) {
