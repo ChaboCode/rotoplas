@@ -1,32 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo
+  name: mysql
   namespace: rotoplas
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo
+      app: mysql
   template:
     metadata:
       labels:
-        app: mongo
+        app: mysql
     spec:
       containers:
-        - name: mongo
-          image: mongo:latest
+        - name: mysql
+          image: mysql:latest
           env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: "root"
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: "example"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "tilapias"
           ports:
-            - containerPort: 27017
+            - containerPort: 3306
           volumeMounts:
-            - name: mongodb-storage
+            - name: mysql-storage
               mountPath: /data/db
       volumes:
-        - name: mongodb-storage
+        - name: mysql-storage
           persistentVolumeClaim:
-            claimName: mongo-pvc
+            claimName: mysql-pvc

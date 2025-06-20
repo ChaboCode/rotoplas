@@ -15,7 +15,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo
+  name: mysql 
   namespace: rotoplas
 spec:
   type: NodePort
@@ -24,4 +24,4 @@ spec:
     targetPort: 27017
     nodePort: 30332
   selector:
-    app: mongo
+    app: mysql
