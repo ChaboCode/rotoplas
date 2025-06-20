@@ -5,50 +5,48 @@
     <title>Rotoplas Uploader</title>
   </head>
   <body>
-    <div class="container">
-      <img src="/favicon.ico" class="icon" />
-      <h1>Rotoplas Uploader</h1>
-      <form
-        id="uploadForm"
-        action="/upload"
-        method="post"
-        enctype="multipart/form-data"
-      >
-        <label for="file">Select a file to upload:</label>
-        <input type="file" id="file" name="file" required />
-        <br /><br />
-        <button type="submit">Upload</button>
-      </form>
-      <p id="urls"></p>
+    <center>
+      <div class="container">
+        <img src="/rotoplas.png" alt="" width="100" />
+        <h1>Rotoplas Uploader</h1>
+        <form
+          id="uploadForm"
+          action="/upload"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <label for="file">Select a file to upload:</label>
+          <input type="file" id="file" name="file" required />
+          <br /><br />
+          <button type="submit">Upload</button>
+        </form>
+        <p id="urls"></p>
 
-      <div class="urls">
-        {{ range.files }}
+        <div class="file-list">
+          {{ range.files }}
 
-        <div>
-          {{ if .IsImg }}
-          <img
-            src="/thumbs/{{.Name}}"
-            alt="{{.Name}}"
-            style="max-width: 200px; max-height: 200px; margin: 10px"
-          />
+          <div class="file-item">
+            {{ if .MimeType | isImg }}
+            <img src="/thumbs/{{.Name}}" alt="{{.Name}}" />
+            {{ end }}
+
+            {{ if .MimeType | isVid }}
+            <video src="/files/{{.Name}}" controls="false"></video>
+            {{ end }}
+
+            <p>Size: {{.Size}}</p>
+            <p>{{.CreatedAt}}</p>
+            <p>{{.MimeType}}</p>
+
+            <a href="/files/{{.Name}}">
+              {{.Name}}
+            </a>
+          </div>
+
           {{ end }}
-
-          {{ if .IsVid }}
-          <video
-            src="/files/{{.Name}}"
-            controls
-            style="max-width: 300px; max-height: 200px; margin: 10px"
-          ></video>
-          {{ end }}
-          <a href="/files/{{.Name}}">
-            {{.Name}}
-          </a>
-          <p class="size">Size: {{.Size}} MB</p>
         </div>
-
-        {{ end }}
       </div>
-    </div>
+    </center>
   </body>
   <script>
     document.querySelector("#uploadForm").addEventListener("submit", (e) => {
@@ -69,88 +67,30 @@
         });
     });
   </script>
+
+  <style>
+    body {
+      background-image: url("/bg.png");
+    }
+
+    p {
+      font-size: 10px;
+    }
+    .file-list {
+      width: 1200px;
+    }
+
+    .file-item {
+      display: inline-block;
+      margin: 20px;
+    }
+
+    form {
+      width: 600px;
+      border: 2px black;
+      padding: 20px;
+      border-style: dashed;
+      background: #a9e0eea8;
+    }
+  </style>
 </html>
-
-<style>
-  img,
-  video,
-  a {
-    margin: none;
-  }
-
-  .icon {
-    image-rendering: pixelated;
-  }
-
-  form {
-    border: 2px solid #c7d47d;
-    border-radius: 20px;
-    padding: 20px;
-  }
-
-  .size {
-    font-size: 12px;
-  }
-
-  .container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-top: 50px;
-  }
-
-  .urls {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    width: 800px;
-    justify-items: center;
-    align-items: center;
-    /* gap: 12px; */
-  }
-
-  .urls > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 10px;
-    padding: 10px;
-  }
-
-  a {
-    display: flex;
-    flex-direction: column;
-    color: black;
-    text-decoration: none;
-    text-align: center;
-  }
-
-  a:hover {
-    color: #007bff;
-    text-decoration: underline;
-  }
-
-  img,
-  video {
-    /* border-radius: 10px; */
-    width: 120px;
-    max-height: 120px;
-    object-fit: cover;
-    transition: 0.3s;
-  }
-
-  @media only screen and (max-width: 800px) {
-    .urls {
-        grid-template-columns: repeat(3, 1fr);
-        width: 100%;
-    }
-  }
-
-  @media only screen and (max-width: 600px) {
-    .urls {
-        grid-template-columns: repeat(2, 1fr);
-    }
-  }
-</style>

@@ -21,4 +21,5 @@ type File struct {
 	Size      int64     `json:"size" validate:"required"`
 	CreatedAt time.Time `bson:"created_at"`
 	UploadIP  string    `json:"upload_ip" validate:"required"`
+	MimeType  string    `json:"mime_type" validate:"required"`
 }

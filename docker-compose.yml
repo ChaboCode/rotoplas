@@ -10,17 +10,16 @@ services:
     volumes:
       - ./files:/usr/src/app/files
     depends_on:
-      - mongo
+      - mysql
 
-  mongo:
-    image: mongo:latest
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    volumes:
-      - mongo-data:/data/db
+  mysql:
+    image: mysql:latest
     ports:
-     - "27017:27017"
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=sietemachete
+    volumes:
+      - mysql_data:/var/lib/mysql
+
 volumes:
-  mongo-data:
+  mysql_data:

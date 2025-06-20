@@ -1,6 +1,16 @@
-FROM golang:1.24-alpine
+FROM golang:1.24-alpine AS deps
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /usr/src/app
+COPY --from=deps /go/pkg /go/pkg
+
+ENV GODEBUG=netdns=go
 
 ENV PORT=8080
 ENV GIN_MODE=release
