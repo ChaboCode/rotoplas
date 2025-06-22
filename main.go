@@ -43,6 +43,10 @@ func getMimeFromHeader(header *multipart.FileHeader) string {
 }
 
 func postFile(c *gin.Context) {
+	hiddenTxt := c.Request.PostFormValue("hidden")
+	log.Print(hiddenTxt)
+	hidden, _ := strconv.ParseBool(hiddenTxt)
+	log.Print(hidden)
 	file, header, _ := c.Request.FormFile("file")
 	log.Printf("%s", header.Filename)
 	encoded := hash(header.Filename)
@@ -70,6 +74,7 @@ func postFile(c *gin.Context) {
 		CreatedAt: time.Now(),
 		UploadIP:  c.ClientIP(),
 		MimeType:  getMimeFromHeader(header),
+		Hidden:    hidden,
 	})
 
 	if err != nil {
@@ -187,7 +192,7 @@ func homePage(c *gin.Context) {
 		"prevPage": page - 1})
 }
 
-func delete(c *gin.Context) {
+func deleteFile(c *gin.Context) {
 	name := c.Query("name")
 
 	err := database.DeleteFile(name)
@@ -236,7 +241,7 @@ func main() {
 	router.GET("/", homePage)
 	router.GET("/hash", getHash)
 	router.POST("/upload", postFile)
-	router.GET("/delete/", delete)
+	router.GET("/delete/", deleteFile)
 	router.Static("/files", "./files")
 	router.GET("/thumbs/:filename", getThumbnail)
 	router.StaticFile("favicon.ico", "./favicon.ico")

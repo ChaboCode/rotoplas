@@ -17,7 +17,10 @@
         >
           <label for="file">Select a file to upload:</label>
           <input type="file" id="file" name="file" required />
-          <br /><br />
+          <br><br>
+          <input type="checkbox" id="hidden" name="hidden">
+          <label for="hidden">No listar</label>
+          <br><br>
           <button type="submit">Upload</button>
         </form>
         <p id="urls"></p>
@@ -82,6 +85,7 @@
 
       const formData = new FormData();
       formData.append("file", document.querySelector("#file").files[0]);
+      formData.append("hidden", document.querySelector('#hidden').checked);
 
       fetch("/upload", {
         method: "POST",

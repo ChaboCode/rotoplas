@@ -22,4 +22,5 @@ type File struct {
 	CreatedAt time.Time `bson:"created_at"`
 	UploadIP  string    `json:"upload_ip" validate:"required"`
 	MimeType  string    `json:"mime_type" validate:"required"`
+	Hidden    bool      `json:"hidden"`
 }

@@ -18,6 +18,7 @@ type File struct {
 	UploadIp  string
 	CreatedAt string
 	MimeType  string
+	Hidden    bool
 }
 
 func ConnectMySQL() {
@@ -57,8 +58,8 @@ func ConnectMySQL() {
 }
 
 func AddFile(file models.File) (int64, error) {
-	result, err := db.Exec("INSERT INTO rotoplas (name, size, upload_ip, created_at, mime_type) VALUES (?, ?, ?, ?, ?)",
-		file.Name, file.Size, file.UploadIP, file.CreatedAt, file.MimeType)
+	result, err := db.Exec("INSERT INTO rotoplas (name, size, upload_ip, created_at, mime_type, hidden) VALUES (?, ?, ?, ?, ?, ?)",
+		file.Name, file.Size, file.UploadIP, file.CreatedAt, file.MimeType, file.Hidden)
 	if err != nil {
 		return 0, err
 	}
@@ -82,7 +83,7 @@ func DeleteFile(name string) error {
 func ListFiles(count int, page int) ([]File, error) {
 	var files []File
 
-	rows, err := db.Query("SELECT * FROM rotoplas ORDER BY created_at DESC LIMIT ? OFFSET ? ", count, (page-1)*count)
+	rows, err := db.Query("SELECT * FROM rotoplas WHERE hidden IS NOT TRUE ORDER BY created_at DESC LIMIT ? OFFSET ? ", count, (page-1)*count)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ func ListFiles(count int, page int) ([]File, error) {
 
 	for rows.Next() {
 		var file File
-		if err := rows.Scan(&file.ID, &file.Name, &file.Size, &file.UploadIp, &file.CreatedAt, &file.MimeType); err != nil {
+		if err := rows.Scan(&file.ID, &file.Name, &file.Size, &file.UploadIp, &file.CreatedAt, &file.MimeType, &file.Hidden); err != nil {
 			return nil, err
 		}
 		files = append(files, file)
@@ -105,7 +106,7 @@ func ListFiles(count int, page int) ([]File, error) {
 
 func Count() (int64, error) {
 	var count int64
-	err := db.QueryRow("SELECT COUNT(*) FROM rotoplas").Scan(&count)
+	err := db.QueryRow("SELECT COUNT(*) FROM rotoplas WHERE hidden IS NOT TRUE").Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -120,6 +121,7 @@ func initTable() {
   upload_ip char(15) DEFAULT NULL,
   created_at datetime DEFAULT NULL,
   mime_type varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  hidden bool DEFAULT NULL,
   PRIMARY KEY (id),
   KEY rotoplas_name_IDX (name) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;`)
