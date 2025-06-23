@@ -19,7 +19,4 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=sietemachete
     volumes:
-      - mysql_data:/var/lib/mysql
-
-volumes:
-  mysql_data:
+      - ./mysql_data:/var/lib/mysql
