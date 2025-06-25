@@ -80,6 +80,30 @@ func DeleteFile(name string) error {
 	return nil
 }
 
+func ListGodMode(count int, page int) ([]File, error) {
+	var files []File
+
+	rows, err := db.Query("SELECT * FROM rotoplas ORDER BY created_at DESC LIMIT ? OFFSET ? ", count, (page-1)*count)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var file File
+		if err := rows.Scan(&file.ID, &file.Name, &file.Size, &file.UploadIp, &file.CreatedAt, &file.MimeType, &file.Hidden); err != nil {
+			return nil, err
+		}
+		files = append(files, file)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
 func ListFiles(count int, page int) ([]File, error) {
 	var files []File
 

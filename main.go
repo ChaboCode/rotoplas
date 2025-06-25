@@ -81,6 +81,7 @@ func postFile(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Error saving file metadata")
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "File uploaded successfully",
 		"filename": encoded,
@@ -167,7 +168,6 @@ func isAudio(mime string) bool {
 }
 
 func homePage(c *gin.Context) {
-	admin := c.Query("admin")
 	pageStr := c.Query("page")
 
 	page, err := strconv.Atoi(pageStr)
@@ -185,11 +185,38 @@ func homePage(c *gin.Context) {
 	}
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"files":    files,
-		"admin":    admin == "admin",
+		"admin":    false,
 		"next":     int(count) > page*10,
 		"prev":     page > 1,
 		"nextPage": page + 1,
 		"prevPage": page - 1})
+}
+
+func goGodMode(c *gin.Context) {
+	pageStr := c.Query("page")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		page = 1 // Default to page 1 if parsing fails
+	}
+
+	files, err := database.ListGodMode(10, page)
+	count, _ := database.Count()
+
+	if err != nil {
+		log.Printf("Error listing files: %v", err)
+		c.String(http.StatusInternalServerError, "Error retrieving files")
+		return
+	}
+
+	c.HTML(http.StatusOK, "index.tmpl", gin.H{
+		"files":    files,
+		"admin":    true,
+		"next":     int(count) > page*10,
+		"prev":     page > 1,
+		"nextPage": page + 1,
+		"prevPage": page - 1})
+
 }
 
 func deleteFile(c *gin.Context) {
@@ -201,7 +228,7 @@ func deleteFile(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, "File deleted successfully")
+	c.Redirect(http.StatusSeeOther, "/")
 }
 
 func main() {
@@ -239,6 +266,7 @@ func main() {
 	})
 
 	router.GET("/", homePage)
+	router.GET("/godmode", goGodMode)
 	router.GET("/hash", getHash)
 	router.POST("/upload", postFile)
 	router.GET("/delete/", deleteFile)
