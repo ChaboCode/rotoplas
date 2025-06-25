@@ -228,7 +228,7 @@ func deleteFile(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusSeeOther, "/")
+	c.Redirect(http.StatusSeeOther, "/godmode")
 }
 
 func main() {
