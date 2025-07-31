@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -244,6 +245,11 @@ func main() {
 	})
 	router.LoadHTMLGlob("templates/*")
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowHeaders: []string{"Origin", "Content-Type"},
+	}))
 
 	// router.GET("/", homePage)
 	router.GET("/faq", faqPage)
